@@ -1,0 +1,123 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsthm, amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage[shortlabels]{enumitem}
+\usepackage{setspace}
+\doublespacing
+
+\newcommand{\N}[0]{\mathbb{N}}
+\newcommand{\Z}[0]{\mathbb{Z}}
+\newcommand{\Q}[0]{\mathbb{Q}}
+\newcommand{\F}[0]{\mathbb{F}}
+\newcommand{\Pro}[0]{\mathbb{P}}
+\newcommand{\overarrow}[1]{\stackrel{#1}{\rightarrow}}
+\newcommand{\verts}[1]{\left\vert #1\right\vert}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\Kpriv}{\mathcal{K}_{\text{priv}}}
+\newcommand{\Kpub}{\mathcal{K}_{\text{pub}}}
+
+\newtheorem{claim}{Claim}
+\newtheorem{conj}{Conjecture}
+\newtheorem{question}{Question}
+\newtheorem{exercise}{Exercise}
+\newtheorem{reading}{Reading}
+\newtheorem{thm}[claim]{Theorem}
+\newtheorem{lemma}[claim]{Lemma}
+\newtheorem{prop}[claim]{Proposition}
+\newtheorem{cor}[claim]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+
+\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+
+
+\begin{document}
+\title{Week 1}
+\author{Nadav Kohen}
+\date{June 22, 2025}
+\maketitle
+
+Welcome! As you begin working through readings and exercises, if you find yourself uncomfortable with the notation and language around sets and functions, consider coming back to the following optional reading.
+
+\begin{reading}[Background]\label{sets-background}
+As needed, read about sets, set notations, functions and  function notations in:\\
+Herstein - Abstract Algebra - pages 3-13.
+\end{reading}
+
+Our goal this week is to introduce some of the basic constructions from public key cryptography that will be useful moving forward. In particular, we will focus on encryption to motivate our learning of some mathematical background, and then we will also discuss digital signatures in our synchronous time together.\\
+
+As will be discussed in Reading \ref{ciphers}, an asymmetric cipher consists of a public key function, $G: \Kpriv\to\Kpub$, an encryption function, $E: \M\times\Kpub\to\C$, and a decryption function, $D: \C\times\Kpriv\to\M$, such that $D(E(m, G(k)), k) = m$ (that is, decrypting an encrypting with the correct key yields the original message). In this definition, $\M$ denotes the set of possible messages, $\Kpriv$ denotes the set of possible private keys, $\Kpub$ denotes the set of possible public keys, and $C$ denotes the set of possible ciphertexts (a.k.a. encrypted messages). In order to make things more concrete and practical, we will want to replace these abstract sets with specific finite sets. In particular, we will use the integers modulo a prime, $\Z/p\Z$ also denoted by $\Z_p$ or $\F_p$ depending on the author (or context). In general we will use $p$ to denote a prime integer.\\
+
+Reading \ref{modular} introduces $\Z/m\Z$ and its operations (without requiring that $m$ be prime, as we will be assuming later). In particular, this reading introduces an efficient algorithm for modular exponentiation. This is important because we will be using the following public key function: Let $g\in\Z_p$ be a fixed non-zero number and define $G: \Z_p^*\to\Z_p$ by
+$$G(x) = g^x\bmod p = g\cdot g\cdot\ldots\cdot g\bmod p\text{ (}x\text{ times)}.$$ We will discuss this further in Reading \ref{DH-crypto}. The problem of trying to compute a private key for a public key with this $G$ is known as the \emph{discrete log problem}.
+
+\begin{reading}\label{modular}
+Read about modular arithmetic and fast modular exponentiation in:\\
+Hoffstein, Pipher, Silverman - An Introduction to Mathematical Cryptography - pages 19-22, 24-26.
+\end{reading}
+
+\begin{exercise}\label{ex:Fast-Exp}
+Implement the fast exponentiation algorithm in the language of your choice. This will allow us to compute public keys, and will also be useful in future exercises.
+\end{exercise}
+
+As we work with numbers in $\Z_p$, it will often be important to compute ``modular inverses.'' That is, if we have $a\in\Z_p$ that is not $0$, then there exists a unique number $b\in\Z_p$ such that $ab \equiv 1\pmod p$. We call $b$ the modular inverse of $a$, and sometimes denote it by $a^{-1}$. For example, $2\cdot 3 = 6\equiv 1\pmod 5$ so that $2$ and $3$ are each others' modular inverses when $p=5$. Reading \ref{euclidean-background} describes one method for computing modular inverses, and describes why our modulus, $p$, needs to be a prime number if we want to guarantee the existence of modular inverses. However, this reading is not necessary for our purposes, since we will describe an alternative method for computing modular inverses in Exercise \ref{ex:prime-inverse}. As such, the following reading should not be your highest priority, but you can come back to it if you're ever curious!
+
+\begin{reading}[Optional Extra Background]\label{euclidean-background}
+Read about prime factorization, the Euclidean algorithm, and B{\'e}zout's identity in either of the following:\\
+Hamkins - Proof and the Art of Mathematics - pages 15-21.\\
+Hoffstein, Pipher, Silverman - An Introduction to Mathematical Cryptography - pages 10-19.
+\end{reading}
+
+The most fundamental result when working with modular exponentiation is \emph{Fermat's little theorem}.
+
+\begin{exercise}\label{ex:FLT}
+Find at least one proof of Fermat’s little theorem online that you understand (there are many arguments out there). Be prepared to share!
+\end{exercise}
+
+Since we will be working in $\Z_p$ where $p$ is a prime number, we can leverage Fermat's little theorem, and the fact that if $ab\equiv ac\pmod p$ and $a\not\equiv 0\pmod p$, then $b\equiv c\pmod p$, to come up with an alternative approach to computing a modular inverse that uses our code from Exercise \ref{ex:Fast-Exp}.
+
+\begin{exercise}\label{ex:prime-inverse}
+Use Fermat’s little theorem and fast modular exponentiation to come up with an alternative algorithm for computing the multiplicative inverse of an element in $\Z_p^*$. Implement this algorithm in the language of your choice.
+\end{exercise}
+
+We now have all of the tools we need to introduce the Diffie-Hellman key exchange and the ElGamal cipher! All of the modular arithmetic we have covered so far will also be needed for our later discussion of Schnorr signatures.\\
+
+We begin with a general discussion of symmetric and asymmetric ciphers in Reading \ref{ciphers}.
+
+\begin{reading}\label{ciphers}
+Read about symmetric ciphers, encoding messages, and asymmetric ciphers in:\\
+Hoffstein, Pipher, Silverman - An Introduction to Mathematical Cryptography - pages 36-47.
+\end{reading}
+
+In Reading \ref{DH-crypto}, we look concretely at an asymmetric cipher build for the public key algorithm we have been studying (modular exponentiation). This reading ends by introducing abelian groups, which is the general context where the Diffie-Hellman key exchange and the ElGamal cipher can be implemented. You can think of abelian groups as a trait (or interface, if you prefer the language Java) for which these algorithms can be defined that will later allow us to switch out some of the number system we have been using for Elliptic Curves (which Bitcoin uses) later.
+
+\begin{reading}\label{DH-crypto}
+Read about one-way functions, the discrete log problem for $\Z_p^*$, the Diffie-Hellman key exchange, the ElGamal cipher, and abelian groups in:\\
+Hoffstein, Pipher, Silverman - An Introduction to Mathematical Cryptography - pages 59-75.
+\end{reading}
+
+Test your knowledge by utilizing your code from Exercises \ref{ex:Fast-Exp} and \ref{ex:prime-inverse} to implement the ElGamal cipher!
+
+\begin{exercise}\label{ex:ElGamal}
+Implement ElGamal for $\Z_p^*$ in the language of your choice.
+\end{exercise}
+
+\begin{exercise}\label{ex:general-ElGamal}
+Once you have completed Exercise \ref{ex:ElGamal}, describe how ElGamal can be implemented using an arbitrary abelian group. Don't forget to mention how public keys are computed. Explain why using $\Z_p$ with the operation of addition as your abelian group is insecure (Hint: recall Reading \ref{modular}).
+\end{exercise}
+
+If you wish to read about the details of elliptic curve computations, see Reading \ref{ec}. However, knowledge of these details will not be necessary moving forward, since we will work at the abstract level of abelian groups and their operations to avoid entangling ourselves in any complicated EC details.
+
+\begin{reading}[Optional Extension]\label{ec}
+Read about the group of points on an Elliptic Curve in:\\
+Hoffstein, Pipher, Silverman - An Introduction to Mathematical Cryptography - pages 279-289.
+\end{reading}
+
+\end{document}

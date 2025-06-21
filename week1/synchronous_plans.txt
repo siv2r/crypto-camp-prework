@@ -1,0 +1,6 @@
+* Greet, welcome and introduce
+* Recap and Q&A
+* Discuss Fermat's little theorem in breakout groups
+* Discuss using abelian groups in place of Z_p
+* Introduce Schnorr signatures informally (following my intro blog post)
+* In the unlikely case we have extra time, discuss Random Self-Reducibility
