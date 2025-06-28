@@ -3,6 +3,7 @@ Unit group (ℤ/pℤ)* implementation.
 """
 
 from __future__ import annotations
+from secrets import randbelow
 
 class UnitsModP:
     P = 0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE65381FFFFFFFFFFFFFFFF
@@ -15,7 +16,7 @@ class UnitsModP:
         self._val = val % self.P
 
     def __add__(self, other: UnitsModP) -> UnitsModP:
-        return NotImplemented
+        return NotImplementedError
 
     def __mul__(self, other: UnitsModP) -> UnitsModP:
         assert isinstance(other, type(self))
@@ -25,6 +26,10 @@ class UnitsModP:
     def __eq__(self, other: UnitsModP) -> bool:
         assert isinstance(other, type(self))
         return self._val == other._val
+
+    @classmethod
+    def random(cls) -> UnitsModP:
+        return cls(randbelow(cls.P - 1) + 1) # 1..p-1
 
 # Generator Point
 G = UnitsModP(2)

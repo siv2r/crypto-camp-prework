@@ -1,6 +1,6 @@
 import unittest
 from secrets import randbits
-from unitsmodp import UnitsModP, G
+from unitsmodp import UnitsModP
 from exercise1 import fast_exp
 
 def inverse(a: UnitsModP) -> UnitsModP:
