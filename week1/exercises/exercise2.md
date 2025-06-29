@@ -50,3 +50,5 @@ $$
 1 &\equiv a^{p-1} \mod p
 \end{align*}
 $$
+
+> Note: A similar proof can be given for $a^{\varphi(m)} \equiv 1 \mod m$, where $\gcd(a, m) = 1$. Here, we take the group $\mathbb{Z_m}^{\times} = \{x : \gcd(x,m) = 1 \}$ where $x \in \mathbb{Z_m}$
