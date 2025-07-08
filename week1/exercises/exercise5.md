@@ -5,12 +5,12 @@ Let $(G, \cdot)$ be an arbitrary finite abelian group with order $m$
 By fundamental theorem of finite abelian groups says:
 
 $$
-G \cong \mathbb{Z_{n1}} \times \mathbb{Z_n2} \times ... \times \mathbb{Z_nk}
+G \cong \mathbb{Z_{n_1}} \times \mathbb{Z_{n_2}} \times ... \times \mathbb{Z_{n_k}}
 $$
 
-where $\mathbb{Z}_{ni}$ are prime powered cyclic groups, with generator $g_i$.
+where $\mathbb{Z_{n_i}}$ are prime powered cyclic groups, with generator $g_i$.
 
-Then there exists an isomorphism $a: G → \mathbb{Z_n1} \times \mathbb{Z_n2}  \times ... \times \mathbb{Z_nk}$ which breaks down an $X \in G$:
+Then there exists an isomorphism $a: G → \mathbb{Z_{n_1}} \times \mathbb{Z_{n_2}}  \times ... \times \mathbb{Z_{n_k}}$ which breaks down an $X \in G$:
 
 $a(X) = (x_1, x_2, …, x_k)$
 
