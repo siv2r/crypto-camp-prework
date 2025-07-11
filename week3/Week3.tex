@@ -1,0 +1,174 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsthm, amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage[shortlabels]{enumitem}
+\usepackage{setspace}
+\usepackage{tcolorbox}
+\usepackage[
+  lambda,
+  advantage,
+  operators,
+  adversary,
+  landau,
+  probability,
+  sets,
+  % notions,
+  % logic,
+  % ff,
+  % mm,
+  % primitives,
+  % oracles,
+  events,
+  % complexity,
+  asymptotics,
+  keys,
+]{cryptocode}
+\doublespacing
+
+%%% cryptocode tweaks
+% Multi-letter variables, e.g., "ctr"
+\NewDocumentCommand\var{m}{\ensuremath{\mathit{#1}}}
+% Make keys and polynomials look like other identifiers.
+% (No idea why cryptocode treats them specially.)
+\RenewDocumentCommand\pckeystyle{m}{\ensuremath{\var{#1}}}
+\RenewDocumentCommand\pcpolynomialstyle{m}{\ensuremath{\var{#1}}}
+% Add 1pt padding to \gamechange (based on original definition).
+\renewcommand{\gamechange}[2][gamechangecolor]{%
+  {\setlength{\fboxsep}{1pt}%
+    \colorbox{#1}{#2}}}
+% Shorthand for \pcalgostyle
+\NewDocumentCommand\algo{}{\pcalgostyle}
+% Oracles
+\NewDocumentCommand{\mathsc}{m}{{\normalfont\textsc{#1}}}
+\RenewDocumentCommand\pcoraclestyle{m}{\ensuremath{\mathsc{#1}}}
+\NewDocumentCommand\oracle{m}{\pcoraclestyle{#1}}
+% Games
+\newcommandx{\game}[4][3=\adv,4=(\secpar)]{{\operatorname{#1}_{#2}^{#3}#4}}
+%\newcommand{\Game}{\algo{Game}}
+% Misc
+\newcommand{\pcsc}{\,;~}
+
+\newcommand{\N}[0]{\mathbb{N}}
+\newcommand{\Z}[0]{\mathbb{Z}}
+\newcommand{\Q}[0]{\mathbb{Q}}
+\newcommand{\F}[0]{\mathbb{F}}
+\newcommand{\G}[0]{\mathbb{G}}
+\newcommand{\pr}[1]{\text{Pr}\left[#1\right]}
+\newcommand{\overarrow}[1]{\stackrel{#1}{\rightarrow}}
+\newcommand{\verts}[1]{\left\vert #1\right\vert}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\Kpriv}{\mathcal{K}_{\text{priv}}}
+\newcommand{\Kpub}{\mathcal{K}_{\text{pub}}}
+
+\newtheorem{claim}{Claim}
+\newtheorem{conj}{Conjecture}
+\newtheorem{question}{Question}
+\newtheorem{exercise}{Exercise}
+\newtheorem{reading}{Reading}
+\newtheorem{thm}[claim]{Theorem}
+\newtheorem{lemma}[claim]{Lemma}
+\newtheorem{prop}[claim]{Proposition}
+\newtheorem{cor}[claim]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+
+\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+
+
+\begin{document}
+\title{Week 3}
+\author{Nadav Kohen}
+\date{July 9, 2025}
+\maketitle
+
+This week has a little less content volume than last week, so I want to encourage you to also review and become more comfortable with the Week 2 document and its exercises as part of this week's assignment.\\
+
+Now that we have a little bit of experience working with security definitions using attack games and probabilities, our goal this week is to make all of the details rigorous to pave the way for the study of the security of Schnorr digital signatures, which we will continue next week.\\
+
+The primary missing piece in our formalism from last week is the definition of the notion that a probability is ``negligible.'' Recall that this notion was central to all of our security definitions, which were all the result of requiring all advantage values to be negligible.
+
+\begin{reading}\label{negl}
+Read about negligible functions and probabilities in:\\
+Mike Rosulek - The Joy of Cryptography - pages 67-71.
+\end{reading}
+
+In Reading \ref{negl}, we encountered the following two equivalent definitions of what it means for a function, $f$, to be negligible:
+\begin{itemize}
+\item For all polynomials, $p$, $\lim_{\lambda\to\infty}p(\lambda)\cdot f(\lambda) = 0$.
+\item For all natural numbers, $c$, $\lim_{\lambda\to\infty}\lambda^c\cdot f(\lambda) = 0$.
+\end{itemize}
+The following are three additional equivalent definitions:
+\begin{itemize}
+\item For all polynomials, $p$, here exists a natural number, $N$, such that for all $\lambda>N$, $\verts{f(\lambda)}\leq \frac{1}{\verts{p(\lambda)}}$.
+\item For all polynomials, $p$, here exists a natural number, $N$, such that for all $\lambda>N$, $\frac{1}{\verts{f(\lambda)}}\geq \verts{p(\lambda)}$.
+\item For all natural numbers, $c$, here exists a natural number, $N$, such that for all $\lambda>N$, $\frac{1}{\verts{f(\lambda)}}\geq \verts{\lambda^c}$.
+\end{itemize}
+All three of these statements are more-or-less equivalent to the statement that $f$ grows smaller faster than the reciprocal of any polynomial, or equivalently that the reciprocal of $f$ grows larger faster than any polynomial. From this perspective, I hope that it is clear that the first two definitions from the reading are also capturing this idea. With this intuition in mind,
+
+\begin{exercise}
+Prove that a function, $f$ satisfying any one of the above properties satisfies all of the above properties.
+\end{exercise}
+
+You may now use any of these definitions interchangeably as it suits you.
+
+\begin{exercise}
+The final page of Reading \ref{negl} has exercises demonstrating properties of negligible functions. Complete Exercises 4.2, 4.3(a), 4.3(b), 4.4 and 4.5.
+\end{exercise}
+
+\begin{exercise}
+Now that we have some more comfort with the formal definition of negligible, double-check, for rigor, your solutions to Exercises 2 and 8 from last week.
+\end{exercise}
+
+One last note on our formal model for proving cryptographic security is that the adversary is not allowed to be an arbitrary program, but rather we will require it to be a Probabalistic Polynomial Time (PPT) program. In addition to allowing our adversaries to have access to randomness (hence, probabalistic) this also means that the number of steps in any execution of $\adv$ must be bounded by some polynomial, $p(\lambda)$. This assumption is not only sensical and practical, but it is also necessary for our definition of negligible to work because it ensures that our adversary cannot turn a negligible success probability into a non-negligible one by brute force (for example, the adversary may not sample a non-negligible proportion of all possible private keys).\\
+
+Let us now begin our study of Schnorr signatures, beginning with the definition of security of a signature scheme: (keep in mind that an ``oracle'' in cryptography is simply a program that all other programs have access to as an interface that takes an input and returns an output, but no party has access to any information about the source code of this program beyond the specification; also note that a PPT adversary can make at most a polynomial-bounded number of queries to any oracle)
+
+\begin{reading}
+Read about the definition of Existentially UnForgable under Chosen Message Attack (EUF-CMA) in:\\
+Jonathan Katz and Yehuda Lindell - Introduction to Modern Cryptography - pages 463-468.
+\end{reading}
+
+Note that when Kats and Lindell refer to $n$, they are talking about the security parameter, which we have been calling $\lambda$. To have some practice with this definition,
+
+\begin{exercise}
+Let $(G, S, V)$ be a secure signature scheme with the message space $\{0,1\}^\lambda$. Let $\hat{G}$ be a new key generation function that simply calls $G$ twice and returns a pair of secret keys, $(sk_0, sk_1)$, and the corresponding pair of public keys, $(pk_0, pk_1)$. Which of the following signature schemes, $(\hat{G}, \hat{S}, \hat{V})$, are secure? Show an attack or prove security (by reduction).
+\begin{enumerate}[(a)]
+\item Prove that ``Sign halves'' is secure: $$\hat{S}((sk_0, sk_1), (m_L, m_R)) = (S(sk_0, m_L), S(sk_1, m_R)),$$ $$\hat{V}((pk_0, pk_1), (m_L, m_R), (\sigma_0, \sigma_1)) = V(pk_0, m_L, \sigma_0)\wedge V(pk_1, m_R, \sigma_1).$$
+\item Show that ``Sign with randomness'' is \textbf{not} secure: $$\hat{S}(sk_0, m) = [\text{choose random }r\in\{0,1\}^\lambda; \text{output }(r, S(sk_0, m\oplus r), S(sk_0, r))],$$ $$\hat{V}(pk_0, m, (r, \sigma_0, \sigma_1)) = V(pk_0, m\oplus r, \sigma_0)\wedge V(pk_0, r, \sigma_1).$$
+\item Prove that ``Accept one valid'' is secure: $$\hat{S}((sk_0, sk_1), m) = (S(sk_0, m), S(sk_1, m)),$$ $$\hat{V}((pk_0, pk_1), m, (\sigma_0, \sigma_1)) = V(pk_0, m, \sigma_0)\vee V(pk_1, m, \sigma_1).$$ (Hint: Consider using that $\pr{\adv\text{ wins}} = \pr{\sigma_0\text{ valid}} + \pr{\sigma_1\text{ valid}} - \pr{\sigma_0,\sigma_1\text{ both valid}}$, and that the last part must be negligible).
+\end{enumerate}
+\end{exercise}
+
+Now we are almost ready to see the Fiat-Shamir Transform (next week), which turns secure identification protocols into secure digitial signature schemes. We will use the Fiat-Shamir Transform to prove the security of the Schnorr signature soon. The only ingredient missing is the Random Oracle Model (ROM), which is how we model our hash functions to make proofs more practical:
+
+\begin{reading}
+Read about the Random Oracle Model in:\\
+Jonathan Katz and Yehuda Lindell - Introduction to Modern Cryptography - pages 187-191.
+\end{reading}
+
+One strange but important feature of the ROM discussed in the section ``Definitions and Proofs in the ROM'' is that during a reduction, adversaries $\adv$ must ``report'' all of their oracle queries to the adversary $\adv'$ that is using $\adv$ as a subroutine, and additionally $\adv'$ may adaptively control the response that $\adv$ gets to these queries so long as $\adv$ cannot distinguish what they receive from a regular random oracle. This kind of reporting feature is also key to other models we will discuss in the future.\\
+
+Next week, we will use the Random Oracle Model (ROM) to construct the Fiat-Shamir transform, and then we will dive straight into proving that the Schnorr digital signature is secure!
+
+%In the following reading, I personally think their introduction of $(I, \text{st})$ in the definition of an identification protocol is a little bit confusing. I encourage you to think of the initial message, $I$, as just some random ``public key'', whose ``private key'', $\text{st}$, will be used in the prover's final response to ensure that they are not leaking their usual private key. Additionally, I think they could mention sooner than they do that step 1 of Algorithm $\adv$ in the proof of Theorem 13.10 is literally just guessing which of the queries that $\adv'$ makes to the random oracle contains the message that $\adv'$ is trying to create a forgery for, and acting accordingly after making this guess. This makes it very unlikely ($\frac{1}{q}$ chance the guess was correct) that Algorithm $\adv$ succeeds, even if $\adv'$ \emph{always} succeeds. However, because there is a polynomial bound on the number of oracle queries $\adv'$ makes, even if $\adv$ is worse than $\adv'$ we still get that $\adv$ has a non-negligible success probability if $\adv'$ does ($\frac{1}{q}$ is non-negligible).
+
+%\begin{reading}
+%Read about the Fiat-Shamir Transform in:\\
+%Jonathan Katz and Yehuda Lindell - Introduction to Modern Cryptography - Section 13.5.1.
+%\end{reading}
+
+%Finally, we are ready to read a proof of the security of the Schnorr signature in the ROM! The final part of the proof where they discuss probabilities is a little bit tricky, but try to get at least a high-level understanding and we can discuss this in detail together.
+
+%\begin{reading}
+%Read about the Schnorr signature's security in:\\
+%Jonathan Katz and Yehuda Lindell - Introduction to Modern Cryptography - Section 13.5.2.
+%\end{reading}
+
+\end{document}
