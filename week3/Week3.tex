@@ -140,9 +140,9 @@ Note that when Kats and Lindell refer to $n$, they are talking about the securit
 \begin{exercise}
 Let $(G, S, V)$ be a secure signature scheme with the message space $\{0,1\}^\lambda$. Let $\hat{G}$ be a new key generation function that simply calls $G$ twice and returns a pair of secret keys, $(sk_0, sk_1)$, and the corresponding pair of public keys, $(pk_0, pk_1)$. Which of the following signature schemes, $(\hat{G}, \hat{S}, \hat{V})$, are secure? Show an attack or prove security (by reduction).
 \begin{enumerate}[(a)]
-\item Prove that ``Sign halves'' is secure: $$\hat{S}((sk_0, sk_1), (m_L, m_R)) = (S(sk_0, m_L), S(sk_1, m_R)),$$ $$\hat{V}((pk_0, pk_1), (m_L, m_R), (\sigma_0, \sigma_1)) = V(pk_0, m_L, \sigma_0)\wedge V(pk_1, m_R, \sigma_1).$$
+\item Prove that ``Sign halves'' is \textbf{not} secure: $$\hat{S}((sk_0, sk_1), (m_L, m_R)) = (S(sk_0, m_L), S(sk_1, m_R)),$$ $$\hat{V}((pk_0, pk_1), (m_L, m_R), (\sigma_0, \sigma_1)) = V(pk_0, m_L, \sigma_0)\wedge V(pk_1, m_R, \sigma_1).$$
 \item Show that ``Sign with randomness'' is \textbf{not} secure: $$\hat{S}(sk_0, m) = [\text{choose random }r\in\{0,1\}^\lambda; \text{output }(r, S(sk_0, m\oplus r), S(sk_0, r))],$$ $$\hat{V}(pk_0, m, (r, \sigma_0, \sigma_1)) = V(pk_0, m\oplus r, \sigma_0)\wedge V(pk_0, r, \sigma_1).$$
-\item Prove that ``Accept one valid'' is secure: $$\hat{S}((sk_0, sk_1), m) = (S(sk_0, m), S(sk_1, m)),$$ $$\hat{V}((pk_0, pk_1), m, (\sigma_0, \sigma_1)) = V(pk_0, m, \sigma_0)\vee V(pk_1, m, \sigma_1).$$ (Hint: Consider using that $\pr{\adv\text{ wins}} = \pr{\sigma_0\text{ valid}} + \pr{\sigma_1\text{ valid}} - \pr{\sigma_0,\sigma_1\text{ both valid}}$, and that the last part must be negligible).
+\item Prove that ``Accept one valid'' is secure: $$\hat{S}((sk_0, sk_1), m) = (S(sk_0, m), S(sk_1, m)),$$ $$\hat{V}((pk_0, pk_1), m, (\sigma_0, \sigma_1)) = V(pk_0, m, \sigma_0)\vee V(pk_1, m, \sigma_1).$$ (Hint: Consider using that $\pr{\sigma_0\text{ or }\sigma_1\text{ is valid}} \leq \pr{\sigma_0\text{ valid}} + \pr{\sigma_1\text{ valid}}$ from Exercise 4 of last week).
 \end{enumerate}
 \end{exercise}
 
